@@ -1,0 +1,49 @@
+from math import log
+
+inputs = [
+    '', 
+    ''
+]
+
+def process(inputs, k):
+    T = len(inputs) # |T| Total document counts
+    F = [] # F(i,w) Frequency of words in i_th(i) doc [{'the': 5, 'but': 2}, {'the': 2}...]
+    S = [] # S(i) Total word(w) counts of i_th(i) doc
+    C = {} # C(w) Doc count that contains the word(w)
+    result = []
+
+    for index, sentence in enumerate(inputs):
+        splits = sentence.split()        
+        S.append(len(splits))
+        F.append({})
+
+        for word in splits:
+            if word not in F[index]:
+                F[index][word] = 1
+            else:
+                F[index][word] += 1
+            
+            if word not in C:
+                C[word] = set()
+            C[word].add(index)
+
+    # Enumerate the list of words to calculate the score. 
+    for index, sentence in enumerate(F):
+        first_place = 0
+        second_place = 0
+        result.append({"first_place": "", "first_place_score": 0, "second_plcae": "", "second_place_score": 0, })
+        for key in sentence:
+            score = sentence[key]/S[index] * log(T/len(C[key]))
+            if score > second_place:
+                if score > first_place: 
+                    result[index]["second_place"] = result[index]["first_place"]
+                    result[index]["second_place_score"] = result[index]["first_place_score"]
+                    result[index]["first_place"] = key
+                    result[index]["first_place_score"] = score
+                else:
+                    result[index]["second_place"] = key
+                    result[index]["second_place_score"] = score
+
+    print(result)
+
+process(inputs, 2)
